@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import jakarta.json.JsonObject;
@@ -41,9 +42,20 @@ public class OrderRepository {
     }
 
 	// • Task 6
-	public JsonObject getStatus (String name) {
+	public Integer getPendingCount (String name) {
 
-		return null;
+		final SqlRowSet rs = jdbcTemplate.queryForRowSet(SQL_JOIN_CUST_ORDER, name, "pending");
+
+  		return rs.getInt("status_count");
+
+	}
+	
+	// • Task 6
+	public Integer getDispatchedCount (String name) {
+
+		final SqlRowSet rs = jdbcTemplate.queryForRowSet(SQL_JOIN_CUST_ORDER, name, "dispatched");
+
+  		return rs.getInt("status_count");
 
 	}
 }

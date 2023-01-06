@@ -34,10 +34,8 @@ import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
 import vttp2022.paf.assessment.eshop.services.WarehouseService;
 
 @RestController
-@RequestMapping (path = "")
+@RequestMapping
 public class OrderController {
-
-	private static final String URL = "http://paf.chuklee.com";
 
 	@Autowired
 	private CustomerRepository custRepo;
@@ -48,7 +46,7 @@ public class OrderController {
 	@Autowired
 	private WarehouseService whSvc;
 
-	@PostMapping (path="/checkout")
+	@PostMapping (path="/checkout", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> resp (@RequestBody MultiValueMap<String,String> form, HttpSession sess) {
 
 		//TODO: Task 3
@@ -175,48 +173,20 @@ public class OrderController {
 	@GetMapping (path="api/order/{name}/status", produces = MediaType.APPLICATION_JSON_VALUE) 
 	public ResponseEntity<String> getStatus (@PathVariable String name) {
 
-		JsonObject jo = orderRepo.getStatus(name);
+		Integer pendingCount = orderRepo.getPendingCount(name);
+		Integer dispatchedCount = orderRepo.getDispatchedCount(name);
+
+		JsonObject json = Json.createObjectBuilder()
+				.add ("name", name)
+				.add ("dispatched", dispatchedCount)
+				.add ("pending", pendingCount)
+				.build();
 
 		return ResponseEntity
 			.status(200)
-			.body(jo.toString());
+			.body(json.toString());
 
 
 	}
-
-	@GetMapping (path = "test")
-	public String test () {
-		// String orderId = "1";
-		// UriComponents uriComponents = UriComponentsBuilder.newInstance()
-      	// 		.scheme("http").host("paf.chuklee").path("/{article-name}")
-      	// 		.buildAndExpand(orderId);
-		// System.out.println(uriComponents);
-
-		// JsonObject json = Json.createObjectBuilder()
-		// .add ("orderId", "fred")
-		// .add ("name", form.getFirst("name"))
-		// .add ("address", )
-		// .add ("email", )
-		// .add ("lineItems", )
-		// .add ("createdBy", "Tan Jia Yi Ellyssa")
-		// .build();
-
-		// 	RequestEntity<String> req = RequestEntity
-		// 	.post("http://paf.chuklee.com/" + orderId)
-		// 	.contentType(MediaType.APPLICATION_JSON)
-		// 	// .headers("Accept", MediaType.APPLICATION_JSON)
-		// 	.body(json.toString(), String.class);
-
-		Order newOrd = new Order();
-		String orderId = UUID.randomUUID().toString().substring(0, 8);
-		newOrd.setOrderId(orderId);
-		whSvc.dispatch(newOrd);
-		
-
-		return "";
-	}
-
-
-	
 
 }
